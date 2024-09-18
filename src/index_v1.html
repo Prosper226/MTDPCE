@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTDPCE</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <img src="logo.png" alt="Logo de la Plateforme" class="logo">
+            <h1>MTDPCE</h1>
+            <nav>
+                <ul>
+                    <li><a href="#" onclick="showMap('map1')">ENTREPRISES</a></li>
+                    <li><a href="#" onclick="showMap('map2')">ASSOCIATIONS</a></li>
+                    <li><a href="#" onclick="showMap('map3')">TEAMS</a></li>
+                </ul>
+            </nav>
+            <div class="search-bar">
+                <input type="text" id="search" placeholder="Rechercher un lieu...">
+                <button onclick="searchLocation()">Rechercher</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="map1" class="map-container"></div>
+        <div id="map2" class="map-container" style="display: none;"></div>
+        <div id="map3" class="map-container" style="display: none;"></div>
+
+        <div id="table-container">
+            <!-- <h2>Détails des objets de la carte</h2> -->
+            <table id="mapTable">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div id="pagination">
+                <button id="prevPage" onclick="prevPage()">Précédent</button>
+                <span id="pageNumber"></span>
+                <button id="nextPage" onclick="nextPage()">Suivant</button>
+            </div>
+        </div>
+    </main>
+
+    <script type="text/javascript" src="app.js"></script>
+    
+    <footer>
+        <p>&copy; 2024 MTDPCE. Tous droits réservés groupe 5 IBAM SIG 2023/2024</p>
+    </footer>
+
+</body>
+</html>

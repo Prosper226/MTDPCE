@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTDPCE</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="src/style.css">
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <a href="/">
+                <img src="/data/pictures/logo.png" alt="Logo de la Plateforme" class="logo">
+            </a>
+            <h1>MTDPCE</h1>
+            <nav>
+                <ul>
+                    <li><a href="#" onclick="showMap('map1')">ASSOCIATIONS</a></li>
+                    <li><a href="#" onclick="showMap('map2')">ENTREPRISES</a></li>
+                    <li><a href="#" onclick="showTeam()">TEAMS</a></li>
+                </ul>
+            </nav>
+            <div class="search-bar">
+                <input type="text" id="search" placeholder="Rechercher un lieu...">
+                <button onclick="searchLocation()">Rechercher</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Cartes -->
+        <div id="map1" class="map-container" style="display: none;"></div>
+        <div id="map2" class="map-container" style="display: none;"></div>
+        <div id="map3" class="map-container-default"></div>
+
+        <!-- Tableau -->
+        <div id="table-container" style="display: none;">
+            <table id="mapTable">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div id="pagination">
+                <button id="prevPage" onclick="prevPage()">Précédent</button>
+                <span id="pageNumber"></span>
+                <button id="nextPage" onclick="nextPage()">Suivant</button>
+            </div>
+        </div>
+
+        <!-- Section TEAMS -->
+        <div id="team-section" style="display: none;">
+            <!-- <h2>GROUPE 5</h2> -->
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="data/pictures/dog.avif" alt="Membre 1">
+                    <p>Wilfrried ZONGNABA</p>
+                    <p>Analyste</p>
+                    <p>z.wilfride@yahoo.com</p>
+                </div>
+                <div class="team-member">
+                    <img src="data/pictures/ima.jpeg" alt="Membre 2">
+                    <p>Jacqueline IMA</p>
+                    <p>Analyste</p>
+                    <p>jacqueline.ima@tic.gov.bf</p>
+                </div>
+                <div class="team-member">
+                    <img src="data/pictures/isma.jpeg" alt="Membre 3">
+                    <p>Ismael YAMEOGO</p>
+                    <p>Analyste</p>
+                    <p>kismael.yameogo@gmail.com</p>
+                </div>
+                <div class="team-member">
+                    <img src="data/pictures/dog.avif" alt="Membre 4">
+                    <p>Fatimata OUEDRAOGO</p>
+                    <p>Developpeur</p>
+                    <p>fatimaouedraogo0903@gmail.com</p>
+                </div>
+                <div class="team-member">
+                    <img src="data/pictures/prosper.jpeg" alt="Membre 5">
+                    <p>Prosper SEDGO</p>
+                    <p>Developpeur</p>
+                    <p>psedgo@gmail.com</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 MTDPCE. Tous droits réservés au groupe 5 IBAM</p>
+    </footer>
+
+    <script>
+        let map1, map2, map3;
+        let currentMap = 'map1';
+        let locations = [];
+
+        // Pagination variables
+        let currentPage = 1;
+        var rowsPerPage = 4;
+
+        function initMap(mapId, lat, lon, zoom) {
+            let map = L.map(mapId, {
+                attributionControl: false
+            }).setView([lat, lon], zoom);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+            L.control.attribution({
+                prefix: false
+            }).addAttribution('<img src="data/pictures/logo.png" alt="Logo" style="height:25px; vertical-align:middle;"> © Groupe 5 IBAM').addTo(map);
+            return map;
+        }
+
+        function loadLocations(mapId, jsonFile = null) {
+            let jsonFiles = null;
+
+            switch (mapId) {
+                case "map1": jsonFile = "data/json/ASSOCIATIONS.json"; break;
+                case "map2": jsonFile = "data/json/ENTREPRISES.json"; break;
+                case "map3": 
+                    jsonFiles = ["data/json/ASSOCIATIONS.json", "data/json/ENTREPRISES.json"]; 
+                    break;
+                default: throw new Error('Invalid map');
+            }
+
+            if (jsonFiles) {
+                // Load both JSON files in parallel
+                Promise.all(jsonFiles.map(file => fetch(file).then(response => response.json())))
+                    .then(([data1, data2]) => {
+                        // Merge the data from both files
+                        locations = [...data1, ...data2].map(loc => ({ ...loc, map: mapId }));
+                        updateTable(mapId);
+                        addMarkersToMap(mapId);
+                    })
+                    .catch(error => console.error('Erreur lors du chargement des données:', error));
+            } else if (jsonFile) {
+                fetch(jsonFile)
+                    .then(response => response.json())
+                    .then(data => {
+                        locations = data.map(loc => ({ ...loc, map: mapId }));
+                        updateTable(mapId);
+                        addMarkersToMap(mapId);
+                    })
+                    .catch(error => console.error('Erreur lors du chargement des données:', error));
+            }
+        }
+
+
+        function addMarkersToMap(mapId) {
+            locations.filter(loc => loc.map === mapId).forEach(loc => {
+                let map = (mapId === 'map1') ? map1 : (mapId === 'map2') ? map2 : map3;
+                L.marker([loc.lat, loc.lon]).addTo(map)
+                    .bindPopup(
+                        "<b>" + loc.name + "<br>" +"<br>" +
+                        "<b>Responsable : </b>" + loc.responsable + "<br>" +
+                        "<b>Adresse : </b>" + loc.adresse + "<br>" +
+                        "<b>Email : </b>" + loc.email + "<br>" +
+                        "<b>Contact : </b>" + loc.contact + "<br>" +             
+                        "<b>LienPage : </b><a href='" + loc.lienPage + "' target='_blank'>" + loc.lienPage + "</a>"
+                    );
+            });
+        }
+
+        function showMap(mapId) {
+
+            console.log(locations)
+            // console.log(mapId)
+            document.querySelectorAll('.map-container').forEach(map => map.style.display = 'none');
+            document.getElementById(mapId).style.display = 'block';
+            currentMap = mapId;
+            currentPage = 1;
+
+            const tableContainer = document.getElementById('table-container');
+            const teamSection = document.getElementById('team-section');
+            const defaultMap = document.getElementById('map3');
+            if (mapId === 'map1' || mapId === 'map2') {
+                tableContainer.style.display = 'block';
+                teamSection.style.display = 'none';
+                defaultMap.style.display = 'none';
+                updateTable(mapId);
+                updateTableColumns(mapId);
+            } else {
+                tableContainer.style.display = 'none';
+            }
+        }
+
+        function showTeam() {
+            document.querySelectorAll('.map-container').forEach(map => map.style.display = 'none');
+            document.getElementById('table-container').style.display = 'none';
+            document.getElementById('map3').style.display = 'none';
+            document.getElementById('team-section').style.display = 'block';
+        }
+
+        function updateTableColumns(mapId) {
+            const tableHead = document.querySelector('#mapTable thead');
+            let columnsHTML = '';
+            if (mapId === 'map1') {
+                columnsHTML = `
+                    <tr>
+                        <th>Nom</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Contact</th>
+                        <th>Directeur</th>
+                    </tr>`;
+                    loadLocations('map1');
+            } else if (mapId === 'map2') {
+                columnsHTML = `
+                    <tr>
+                        <th>Nom de l'Entreprise</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Téléphone</th>
+                        <th>Manager</th>
+                    </tr>`;
+                    loadLocations('map2');
+            }
+
+            tableHead.innerHTML = columnsHTML;
+        }
+
+        function updateTable(mapId) {
+            console.log(location)
+            const tableBody = document.querySelector('#mapTable tbody');
+            tableBody.innerHTML = '';
+            console.log(locations)
+            const filteredLocations = locations.filter(loc => loc.map === mapId);
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedLocations = filteredLocations.slice(start, end);
+
+            if (paginatedLocations.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5">Aucune donnée disponible</td></tr>';
+            } else {
+                paginatedLocations.forEach(loc => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="clickable">${loc.name}</td>
+                        <td>${loc.lat.toFixed(4)}</td>
+                        <td>${loc.lon.toFixed(4)}</td>
+                        <td>${loc.contact}</td>
+                        <td>${loc.responsable}</td>
+                        `;
+                    row.onclick = function() {
+                        redirectToLocation(loc.lat, loc.lon);
+                    };
+                    tableBody.appendChild(row);
+                });
+            }
+
+            const totalPages = Math.ceil(filteredLocations.length / rowsPerPage);
+            document.getElementById('pageNumber').textContent = `Page ${currentPage} / ${totalPages}`;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable(currentMap);
+            }
+        }
+
+        function nextPage() {
+            const totalRows = locations.filter(loc => loc.map === currentMap).length;
+            if (currentPage < Math.ceil(totalRows / rowsPerPage)) {
+                currentPage++;
+                updateTable(currentMap);
+            }
+        }
+
+        function searchLocation() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const result = locations.find(loc => loc.name.toLowerCase().includes(query) && loc.map === currentMap);
+
+            if (result) {
+                redirectToLocation(result.lat, result.lon);
+                alert(`Lieu trouvé : ${result.name}`);
+            } else {
+                alert('Lieu non trouvé sur cette carte');
+            }
+        }
+
+        function redirectToLocation(lat, lon) {
+            if (currentMap === 'map1') map1.setView([lat, lon], 14);
+            if (currentMap === 'map2') map2.setView([lat, lon], 14);
+        }
+
+        // Initialisation des cartes
+        map1 = initMap('map1', 12.3714, -1.5197, 13);
+        map2 = initMap('map2', 12.3714, -1.5197, 10);
+        map3 = initMap('map3', 12.3714, -1.5197, 13);
+
+        // Chargement des données (remplacez les fichiers JSON par les vôtres)
+        loadLocations('map3');
+
+    </script>
+</body>
+</html>

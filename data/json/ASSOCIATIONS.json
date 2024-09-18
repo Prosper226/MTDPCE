@@ -1,0 +1,63 @@
+[
+    { 
+        "name": "Association des Informaticiens du Faso", 
+        "responsable": "...", 
+        "adresse": "06 BP 10734 06, Dassasgo, Ouagadougou", 
+        "email": "...",
+        "contact": "25366463",
+        "lienPage": "www.sitel.bf", 
+        "lat": 12.4316085, 
+        "lon": -1.802797,
+        "map" : 2
+    },
+    { 
+        "name": "Association Burkinabè des Informaticiens de la Santé (ABIS)", 
+        "responsable": "Dr. Abdoulaye Tapsoba (Président)", 
+        "adresse": "Ouagadougou", 
+        "email": "info@abis.bf",
+        "contact": "25 34 45 66",
+        "lienPage": "...", 
+        "lat": 12.3413665,
+        "lon": -1.6238524
+    },
+    { 
+        "name": "ABDI (Association Burkinabè des Domaines Internet)", 
+        "responsable": "Izaï Toé", 
+        "adresse": "01 BP 525 Ouagadougou", 
+        "email": "contact@abdi.bf",
+        "contact": "25332525",
+        "lienPage": "https://www.facebook.com/profile.php?id=100063975257159", 
+        "lat": 12.371593, 
+        "lon": -1.4947546
+    },
+    { 
+        "name": "Association des Femmes en TIC du Burkina Faso (AFTIC)", 
+        "responsable": "Aïssata Diallo", 
+        "adresse": "Ouagadougou", 
+        "email": "contact@aftic.bf",
+        "contact": "+226 70 15 34 56",
+        "lienPage": "...", 
+        "lat": 12.408679571004354, 
+        "lon": -1.55167376820489
+    },
+    { 
+        "name": "Association pour la Promotion des Logiciels Libres au Burkina Faso (APLLBF)", 
+        "responsable": "Sidiki Ouédraogo (Président)", 
+        "adresse": "Ouagadougou", 
+        "email": "contact@apllbf.bf",
+        "contact": "+226 25 32 16 89",
+        "lienPage": "...", 
+        "lat": 12.4033877,
+        "lon": -1.5229614
+    },
+    { 
+        "name": "Réseau des Acteurs du Numérique au Burkina Faso (RANBF)", 
+        "responsable": "Michel Kaboré (Président)", 
+        "adresse": "Ouagadougou", 
+        "email": "info@ranbf.bf",
+        "contact": "+226 70 21 09 11",
+        "lienPage": "...", 
+        "lat": 12.3889565,
+        "lon": -1.5232093
+    }
+]
